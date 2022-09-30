@@ -8,19 +8,22 @@ public class BoxesManager {
 
     private static ArrayList<AntiVampBox> boxes = new ArrayList<>();
 
-    public ArrayList<AntiVampBox> getBoxes() {
+
+
+    public static ArrayList<AntiVampBox> getBoxes() {
         return boxes;
     }
-    public AntiVampBox getBox(int index) {
+    public static AntiVampBox getBox(int index) {
         return boxes.get(index);
     }
 
-    public void addBox(AntiVampBox box) {
+    public static void addBox(AntiVampBox box) {
         boxes.add(box);
     }
-    public void addAll(AntiVampBox... boxes) {
+    public static void addAll(AntiVampBox... boxes) {
         for(AntiVampBox box : boxes) {
-            this.addBox(box);
+            addBox(box);
         }
     }
+
 }

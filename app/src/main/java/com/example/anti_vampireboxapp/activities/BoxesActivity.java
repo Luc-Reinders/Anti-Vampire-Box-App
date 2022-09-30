@@ -4,6 +4,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.example.anti_vampireboxapp.BoxesManager;
 import com.example.anti_vampireboxapp.R;
 import com.example.anti_vampireboxapp.box.AntiVampBox;
 import com.example.anti_vampireboxapp.custom_lists.BoxListAdapter;
@@ -14,8 +15,8 @@ import java.util.Arrays;
 public class BoxesActivity extends Activity {
 
     ListView boxListView;
-    ArrayList<AntiVampBox> boxes = new ArrayList<>(); //TODO: MAKE THIS BOX OBJECTS INSTEAD OF STRINGS
-    BoxListAdapter boxListAdapter; //TODO: CUSTOM LISTVIEW AND/OR ADAPTER
+    ArrayList<AntiVampBox> boxes = BoxesManager.getBoxes();
+    BoxListAdapter boxListAdapter;
 
     @Override
     public int getLayoutID() {
