@@ -11,7 +11,6 @@ public abstract class Activity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(getLayoutID());
         buildComponents();
-        onStart();
     }
 
     public abstract int getLayoutID();

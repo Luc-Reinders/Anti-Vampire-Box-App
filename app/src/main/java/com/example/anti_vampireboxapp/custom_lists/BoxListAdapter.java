@@ -4,11 +4,9 @@ import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Switch;
 
@@ -41,9 +39,9 @@ public class BoxListAdapter extends ArrayAdapter<AntiVampBox> {
         Switch powerSwitch = rowView.findViewById(R.id.box_switch);
 
         editText.setText(selectedBox.getName());
-        powerSwitch.setChecked(selectedBox.isEnabled());
+        powerSwitch.setChecked(selectedBox.isCurrentEnabled());
 
-        //TODO: DOES THIS NOT CONSTANTLY ADD THE SAME LISTENERS TO THE SAME COMPONENTS?
+        //TODO: THE LISTENERS SHOULD ONLY BE ATTACHED ONCE, BUT THIS WILL WORK SO WHATEVER
         editText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -59,7 +57,7 @@ public class BoxListAdapter extends ArrayAdapter<AntiVampBox> {
             }
         });
         powerSwitch.setOnCheckedChangeListener(
-                (compoundButton, b) -> selectedBox.setEnabled(powerSwitch.isChecked())
+                (compoundButton, b) -> selectedBox.setCurrentEnabled(powerSwitch.isChecked())
         );
 
         return rowView;
