@@ -26,4 +26,25 @@ public class BoxesManager {
         }
     }
 
+    public static boolean areAllBoxesEnabled() {
+        return areAllBoxesEnabled(true);
+    }
+    public static boolean areAllBoxesDisabled() {
+        return areAllBoxesEnabled(false);
+    }
+    private static boolean areAllBoxesEnabled(boolean enabled) {
+        for(AntiVampBox box : boxes) {
+            if(box.isCurrentEnabled() != enabled) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static void setCurrentAllBoxes(boolean enabled) {
+        for(AntiVampBox box : boxes) {
+            box.setCurrentEnabled(enabled);
+        }
+    }
+
 }
