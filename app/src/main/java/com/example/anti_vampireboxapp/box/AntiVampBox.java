@@ -1,11 +1,18 @@
 package com.example.anti_vampireboxapp.box;
 
+import android.content.Context;
+
 import androidx.annotation.NonNull;
 
 /**
  * This class represents the Anti-Vampire box.
  */
 public class AntiVampBox {
+
+    /**
+     * The connection to the Arduino
+     */
+    private ArduinoConnection arduinoConnection;
 
     /**
      * Name of the Anti-Vampire box.
@@ -46,13 +53,29 @@ public class AntiVampBox {
         return vampDevicePowerUsage;
     }
 
+
+
     /**
      * Constructor of this class.
      * @param name Name of the Anti-Vampire box.
      */
     public AntiVampBox(String name) {
+        setName(name); //TODO: THIS CONSTRUCTOR WILL HAVE TO BE REMOVED LATER
+    }
+
+    /**
+     * Constructor of an Anti-Vampire box
+     * @param name Name of the box
+     * @param deviceAddress The MAC address of the Arduino
+     * @param currActivity The activity that is currently active when initializing this
+     *                     Anti-Vampire box. This is needed because of permissions.
+     */
+    public AntiVampBox(String name, String deviceAddress, Context currActivity) {
+        arduinoConnection = new ArduinoConnection(deviceAddress, currActivity);
         setName(name);
     }
+
+
 
     /**
      * Gets the amount of money we have saved with this Anti-Vampire box.
@@ -63,7 +86,7 @@ public class AntiVampBox {
     }
 
     /**
-     * Overriding the {@link #toString()} method to return the name of the box.
+     * Overriding the toString method to return the name of the box.
      * @return name of this box.
      */
     @NonNull

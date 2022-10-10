@@ -20,4 +20,15 @@ public class Constants {
      */
     public static double J_COST = KWH_COST/(3600000d);
 
+
+
+    /**
+     * used in bluetooth handler to identify message status
+     */
+    public final static int CONNECTING_STATUS = 1;
+    /**
+     * used in bluetooth handler to identify message update
+     */
+    public final static int MESSAGE_READ = 2;
+
 }
