@@ -34,9 +34,60 @@ public class ConnectionThread extends Thread {
     private BluetoothSocket mmSocket;
     private Context activityContext;
 
-    /*
-    This handler handles the feedback of the Arduino and connection status to said Arduino.
+    /**
+     * This object keeps track of the vampire device usage.
      */
+    private VampDeviceUsageInfo vampDeviceUsageInfo = new VampDeviceUsageInfo();
+    public VampDeviceUsageInfo getVampDeviceUsageInfo() {
+        return vampDeviceUsageInfo;
+    }
+
+    private boolean currentEnabledForVampDevice = false;
+
+    private double timeSinceLastCheck;
+
+    /**
+     * The time the current has been enabled for the Vampire device in millis
+     */
+    private double currentEnabledTime;
+    public double getCurrentEnabledTime() {
+        if(currentEnabledForVampDevice) {
+            currentEnabledTime += getTimeSinceLastCheck();
+            timeSinceLastCheck = System.currentTimeMillis();
+        }
+        return currentEnabledTime;
+    }
+
+    /**
+     * The time that current has been disabled for the Vampire device in millis
+     */
+    private double currentDisabledTime;
+    public double getCurrentDisabledTime() {
+        if(!currentEnabledForVampDevice) {
+            currentDisabledTime += getTimeSinceLastCheck();
+            timeSinceLastCheck = System.currentTimeMillis();
+        }
+        return currentDisabledTime;
+    }
+
+    /*TODO: These commands should be send to the Arduino. Discuss with Iwo what these commands
+       should be.*/
+    public void enableCurrentToVampDevice() {
+        currentEnabledForVampDevice = true;
+        connectedThread.write("enable current");
+    }
+    public void disableCurrentToVampDevice() {
+        currentEnabledForVampDevice = false;
+        connectedThread.write("disable current");
+    }
+
+    private double getTimeSinceLastCheck() {
+        return System.currentTimeMillis() - timeSinceLastCheck;
+    }
+
+    /*
+        This handler handles the feedback of the Arduino and connection status to said Arduino.
+         */
     private Handler handler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(@NonNull Message msg) {
@@ -66,31 +117,33 @@ public class ConnectionThread extends Thread {
                 case MESSAGE_READ:
                     String arduinoMsg = msg.obj.toString(); // Read message from Arduino
 
-                    //TODO: Discuss with Pepijn the commands that will be send to the app
-                    switch (arduinoMsg.toLowerCase()) {
-                        case "command 1":
-                            //Execute something
-                            break;
-                        case "command 2":
-                            //Execute something else
-                            break;
+                    //TODO: Discuss with Iwo the commands that will be send to the app
+                    if(arduinoMsg.contains("power usage:")) {
+                        String pwrUsgStr = arduinoMsg.substring(arduinoMsg.indexOf(':') + 1);
+                        vampDeviceUsageInfo.setPowerUsage(Double.parseDouble(pwrUsgStr));
                     }
+                    else if(arduinoMsg.contains("Other method")) {
+
+                    }
+
                     break;
             }
+            connectedThread.write("send information aaah");
         }
     };
 
 
-    public ConnectionThread(BluetoothAdapter bluetoothAdapter, String address, Context context) {
+    public boolean createConnection(BluetoothAdapter bluetoothAdapter, String address, Context context) {
         /*
         Use a temporary object that is later assigned to mmSocket
         because mmSocket is final.
         */
         activityContext = context;
+        timeSinceLastCheck = System.currentTimeMillis();
         BluetoothDevice bluetoothDevice = bluetoothAdapter.getRemoteDevice(address);
         BluetoothSocket tmp = null;
 
-        /* TODO: Android studio is telling me there is a better way to do this with the help
+        /* TODO: Android studio is telling me there is a better way to do this with the help of
             activityCompat.requestPermissions(). Here is the full message: */
         /* TODO: Consider calling
             ActivityCompat#requestPermissions here to request the missing permissions, and then
@@ -99,7 +152,7 @@ public class ConnectionThread extends Thread {
             See the documentation for ActivityCompat#requestPermissions for more details. */
         if (ActivityCompat.checkSelfPermission(activityContext,
                 Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-            return;
+            return false;
         }
 
         UUID uuid = bluetoothDevice.getUuids()[0].getUuid();
@@ -114,17 +167,24 @@ public class ConnectionThread extends Thread {
             tmp = bluetoothDevice.createInsecureRfcommSocketToServiceRecord(uuid);
         } catch (IOException e) {
             Log.e(TAG, "Socket's create() method failed", e);
+            return false;
         }
         mmSocket = tmp;
+        return true;
     }
 
 
-
+    private boolean connectionSucceeded = true;
+    public boolean startConnection() {
+        start();
+        return connectionSucceeded;
+    }
     public void run() {
         // Cancel discovery because it otherwise slows down the connection.
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (ActivityCompat.checkSelfPermission(activityContext,
                 Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+            connectionSucceeded = false;
             return;
         }
         bluetoothAdapter.cancelDiscovery();
@@ -136,6 +196,7 @@ public class ConnectionThread extends Thread {
             handler.obtainMessage(CONNECTING_STATUS, 1, -1).sendToTarget();
         } catch (IOException connectException) {
             // Unable to connect; close the socket and return.
+            connectionSucceeded = false;
             try {
                 mmSocket.close();
                 Log.e("Status", "Cannot connect to device");
@@ -150,16 +211,6 @@ public class ConnectionThread extends Thread {
         // the connection in a separate thread.
         connectedThread = new ConnectedThread(mmSocket, handler);
         connectedThread.run();
-    }
-
-
-    /*TODO: These commands should be send to the Arduino. Discuss with Pepijn what these commands
-       should be.*/
-    public void enableCurrent() {
-        connectedThread.write("enable current");
-    }
-    public void disableCurrent() {
-        connectedThread.write("disable current");
     }
 
 

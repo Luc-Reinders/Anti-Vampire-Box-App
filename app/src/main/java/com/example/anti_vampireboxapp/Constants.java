@@ -10,7 +10,12 @@ public class Constants {
     /**
      * Arduino maximum electric cost per year in euros as of 2022.
      */
-    public static double ARDUINO_MAX_COST = 4;
+    public static double ARDUINO_MAX_COST_YEAR = 4;
+
+    /**
+     * Arduino maximum electric cost per second in euros as of 2022.
+     */
+    public static double ARDUINO_MAX_COST_SECOND = ARDUINO_MAX_COST_YEAR/31536000d;
     /**
      * Average cost for one kWh in euros in the Netherlands.
      */

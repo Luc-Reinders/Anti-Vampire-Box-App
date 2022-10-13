@@ -9,17 +9,32 @@ import android.content.Context;
  */
 public class ArduinoConnection {
 
-    private ConnectionThread connectionThread;
+    private ConnectionThread connectionThread = new ConnectionThread();
     private BluetoothAdapter bluetoothAdapter;
 
-
-    /**
-     * Constructor of this class, which automatically initializes the connection.
-     */
-    public ArduinoConnection(String deviceAddress, Context context) {
+    public boolean connect(String deviceAddress, Context context) {
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        connectionThread = new ConnectionThread(bluetoothAdapter, deviceAddress, context);
-        connectionThread.start();
+        if(!connectionThread.createConnection(bluetoothAdapter, deviceAddress, context)) {
+            return false;
+        }
+        if(!connectionThread.startConnection()) {
+            return false;
+        }
+        return true;
+    }
+
+
+
+    public VampDeviceUsageInfo getVampDeviceUsageInfo() {
+        return connectionThread.getVampDeviceUsageInfo();
+    }
+
+    public double getCurrentVampEnabledTime() {
+        return connectionThread.getCurrentEnabledTime();
+    }
+
+    public double getCurrentVampDisabledTime() {
+        return connectionThread.getCurrentDisabledTime();
     }
 
 }
