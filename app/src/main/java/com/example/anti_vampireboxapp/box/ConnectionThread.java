@@ -120,7 +120,7 @@ public class ConnectionThread extends Thread {
                     //TODO: Discuss with Iwo the commands that will be send to the app
                     if(arduinoMsg.contains("power usage:")) {
                         String pwrUsgStr = arduinoMsg.substring(arduinoMsg.indexOf(':') + 1);
-                        vampDeviceUsageInfo.setPowerUsage(Double.parseDouble(pwrUsgStr));
+                        vampDeviceUsageInfo.give(Double.parseDouble(pwrUsgStr));
                     }
                     else if(arduinoMsg.contains("Other method")) {
 
@@ -128,7 +128,8 @@ public class ConnectionThread extends Thread {
 
                     break;
             }
-            connectedThread.write("send information aaah");
+            //TODO: ASK FOR INFORMATION AGAIN
+            //connectedThread.write("send information aaah");
         }
     };
 

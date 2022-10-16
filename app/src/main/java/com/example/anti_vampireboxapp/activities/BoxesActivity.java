@@ -53,7 +53,7 @@ public class BoxesActivity extends Activity {
      * @param v
      */
     public void addBox(View v) {
-        boxes.add(new AntiVampBox("BoxName"));
+        boxes.add(new AntiVampBox());
         updateAdapter();
     }
 

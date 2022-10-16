@@ -41,15 +41,8 @@ public class AntiVampBox {
     public void setCurrentEnabled(boolean currentEnabled) {
         this.currentEnabled = currentEnabled;
     }
-
-
-
-    /**
-     * Constructor of an Anti-Vampire box
-     * @param name Name of the box
-     */
-    public AntiVampBox(String name) {
-        setName(name);
+    public ConnectionState getConnectionState() {
+        return connectionState;
     }
 
 

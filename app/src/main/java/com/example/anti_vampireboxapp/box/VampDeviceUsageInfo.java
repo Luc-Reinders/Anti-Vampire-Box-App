@@ -19,12 +19,24 @@ public class VampDeviceUsageInfo {
      */
     private double activeUsageAvg = 1;
 
+    /**
+     * Gets the usage in Watts at this moment in time.
+     * @return A double in Watts
+     */
     public double getUsage() {
         return usage;
     }
+    /**
+     * Gets the usage in Watts when the device is active.
+     * @return A double in Watts
+     */
     public double getActiveUsageAvg() {
         return activeUsageAvg;
     }
+    /**
+     * Gets the usage in Watts when the device is sleeping.
+     * @return A double in Watts
+     */
     public double getSleepUsageAvg() {
         return sleepUsageAvg;
     }
@@ -35,7 +47,7 @@ public class VampDeviceUsageInfo {
      * powerUsage is closer to sleepUsageAvg or activeUsageAvg.
      * @param powerUsage a double greater than zero
      */
-    public void setPowerUsage(double powerUsage) {
+    public void give(double powerUsage) {
         usage = powerUsage;
         if(Math.abs(sleepUsageAvg - powerUsage) < Math.abs(activeUsageAvg - powerUsage)) {
             sleepUsageAvg = (sleepUsageAvg + powerUsage)/2;
