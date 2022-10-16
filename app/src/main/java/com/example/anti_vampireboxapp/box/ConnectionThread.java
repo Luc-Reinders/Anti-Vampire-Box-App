@@ -7,6 +7,7 @@ import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Looper;
+import android.os.ParcelUuid;
 import android.util.Log;
 import android.os.Message;
 
@@ -38,6 +39,7 @@ public class ConnectionThread extends Thread {
      * This object keeps track of the vampire device usage.
      */
     private VampDeviceUsageInfo vampDeviceUsageInfo = new VampDeviceUsageInfo();
+
     public VampDeviceUsageInfo getVampDeviceUsageInfo() {
         return vampDeviceUsageInfo;
     }
@@ -50,8 +52,9 @@ public class ConnectionThread extends Thread {
      * The time the current has been enabled for the Vampire device in millis
      */
     private double currentEnabledTime;
+
     public double getCurrentEnabledTime() {
-        if(currentEnabledForVampDevice) {
+        if (currentEnabledForVampDevice) {
             currentEnabledTime += getTimeSinceLastCheck();
             timeSinceLastCheck = System.currentTimeMillis();
         }
@@ -62,8 +65,9 @@ public class ConnectionThread extends Thread {
      * The time that current has been disabled for the Vampire device in millis
      */
     private double currentDisabledTime;
+
     public double getCurrentDisabledTime() {
-        if(!currentEnabledForVampDevice) {
+        if (!currentEnabledForVampDevice) {
             currentDisabledTime += getTimeSinceLastCheck();
             timeSinceLastCheck = System.currentTimeMillis();
         }
@@ -76,6 +80,7 @@ public class ConnectionThread extends Thread {
         currentEnabledForVampDevice = true;
         connectedThread.write("enable current");
     }
+
     public void disableCurrentToVampDevice() {
         currentEnabledForVampDevice = false;
         connectedThread.write("disable current");
@@ -118,11 +123,10 @@ public class ConnectionThread extends Thread {
                     String arduinoMsg = msg.obj.toString(); // Read message from Arduino
 
                     //TODO: Discuss with Iwo the commands that will be send to the app
-                    if(arduinoMsg.contains("power usage:")) {
+                    if (arduinoMsg.contains("power usage:")) {
                         String pwrUsgStr = arduinoMsg.substring(arduinoMsg.indexOf(':') + 1);
                         vampDeviceUsageInfo.give(Double.parseDouble(pwrUsgStr));
-                    }
-                    else if(arduinoMsg.contains("Other method")) {
+                    } else if (arduinoMsg.contains("Other method")) {
 
                     }
 
@@ -139,6 +143,9 @@ public class ConnectionThread extends Thread {
         Use a temporary object that is later assigned to mmSocket
         because mmSocket is final.
         */
+        if (!BluetoothAdapter.checkBluetoothAddress(address)) {
+            return false;
+        }
         activityContext = context;
         timeSinceLastCheck = System.currentTimeMillis();
         BluetoothDevice bluetoothDevice = bluetoothAdapter.getRemoteDevice(address);
@@ -151,11 +158,15 @@ public class ConnectionThread extends Thread {
             overriding public void onRequestPermissionsResult(int requestCode, String[] permissions,
             int[] grantResults) to handle the case where the user grants the permission.
             See the documentation for ActivityCompat#requestPermissions for more details. */
+        //ActivityCompat.requestPermissions();
         if (ActivityCompat.checkSelfPermission(activityContext,
                 Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
             return false;
         }
-
+        ParcelUuid[] uuids = bluetoothDevice.getUuids();
+        if(uuids.length == 0) {
+            return false;
+        }
         UUID uuid = bluetoothDevice.getUuids()[0].getUuid();
 
         try {

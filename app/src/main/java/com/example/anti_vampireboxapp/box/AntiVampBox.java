@@ -22,7 +22,12 @@ public class AntiVampBox {
     /**
      * Name of the Anti-Vampire box.
      */
-    private String name;
+    private String name = "";
+
+    /**
+     * The MAC address of the Bluetooth device given by the user.
+     */
+    private String address = "";
     /**
      * Boolean to indicate if we are letting power through to the Vampire device or not.
      */
@@ -34,6 +39,12 @@ public class AntiVampBox {
     }
     public void setName(String name) {
         this.name = name;
+    }
+    public String getAddress() {
+        return address;
+    }
+    public void setAddress(String address) {
+        this.address = address;
     }
     public boolean isCurrentEnabled() {
         return currentEnabled;
@@ -54,11 +65,15 @@ public class AntiVampBox {
      *                     Anti-Vampire box. This is needed because of permissions.
      */
     public void connect(String deviceAddress, Context currActivity) {
+        connectionState = ConnectionState.CONNECTING;
         if(arduinoConnection.connect(deviceAddress, currActivity)) {
             connectionState = ConnectionState.CONNECTED;
         } else {
             connectionState = ConnectionState.CONNECTION_FAILED;
         }
+    }
+    public void connect(Context currActivity) {
+        connect(address, currActivity);
     }
 
 

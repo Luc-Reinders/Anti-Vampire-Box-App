@@ -44,7 +44,7 @@ public class BoxesActivity extends Activity {
     @Override
     public void declareComponents() {
         boxListView = findViewById(R.id.box_list_view);
-        boxListAdapter = new BoxListAdapter(this, R.layout.box_list, boxes);
+        boxListAdapter = new BoxListAdapter(this, R.layout.box_list, boxes, this);
         boxListView.setAdapter(boxListAdapter);
     }
 
