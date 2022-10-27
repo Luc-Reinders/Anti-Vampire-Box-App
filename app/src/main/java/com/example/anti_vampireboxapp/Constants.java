@@ -36,4 +36,13 @@ public class Constants {
      */
     public final static int MESSAGE_READ = 2;
 
+
+
+    public final static String TURN_CURRENT_VAMP_DEVICE_OFF = "0";
+    public final static String TURN_CURRENT_VAMP_DEVICE_ON = "1";
+    public final static String REQUEST_POWER_LEVEL = "2";
+
+
+    //MAC ADDRESS: 98:D3:41:F6:8A:83
+
 }

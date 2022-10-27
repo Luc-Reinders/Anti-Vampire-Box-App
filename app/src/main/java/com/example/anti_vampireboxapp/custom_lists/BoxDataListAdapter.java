@@ -1,6 +1,7 @@
 package com.example.anti_vampireboxapp.custom_lists;
 
 import android.content.Context;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,9 +11,11 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.example.anti_vampireboxapp.BoxesManager;
 import com.example.anti_vampireboxapp.R;
 import com.example.anti_vampireboxapp.box.AntiVampBox;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 /**
@@ -20,6 +23,8 @@ import java.util.List;
  * is shown in the DataActivity class.
  */
 public class BoxDataListAdapter extends ArrayAdapter<AntiVampBox> {
+
+    DecimalFormat numFormat = new DecimalFormat("#.##");
 
     /**
      * Match constructor from super.
@@ -57,19 +62,43 @@ public class BoxDataListAdapter extends ArrayAdapter<AntiVampBox> {
         //Set text to TextView components so that the data shows up in the row.
         if(selectedBox != null) {
             boxName.setText(selectedBox.getName());
-            powerUsageVamp.setText(Double.toString(selectedBox.getVampDeviceUsage()));
-            moneySaved.setText(Double.toString(selectedBox.getMoneySaved()));
+            final Handler updateHandler = new Handler();
+            final Runnable updateValuesRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    powerUsageVamp.setText(numFormat.format(selectedBox.getVampDeviceUsage()));
+                    moneySaved.setText("" + (float)selectedBox.getMoneySaved());
+                    updateHandler.postDelayed(this, 100);
+                }
+            };
+            updateHandler.postDelayed(updateValuesRunnable, 100);
         }
         else {
             if(position == 0) { //Legend
                 boxName.setText("Box name");
-                powerUsageVamp.setText("Vamp usage");
-                moneySaved.setText("Money saved");
+                powerUsageVamp.setText("Vamp usage (Watt)");
+                moneySaved.setText("Money saved (Euro)");
             }
             else { //total
                 boxName.setText("Total"); //TODO: HAS TO BE CALCULATED
-                powerUsageVamp.setText("0");
-                moneySaved.setText("0");
+
+                final Handler updateHandler = new Handler();
+                final Runnable updateTotalRunnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        double powerSum = 0;
+                        double moneySum = 0;
+                        for(AntiVampBox box : BoxesManager.getBoxes()) {
+                            powerSum = box.getVampDeviceUsage();
+                            moneySum = box.getMoneySaved();
+                        }
+
+                        powerUsageVamp.setText(numFormat.format((powerSum)));
+                        moneySaved.setText("" + (float)moneySum);
+                        updateHandler.postDelayed(this, 100);
+                    }
+                };
+                updateHandler.postDelayed(updateTotalRunnable, 100);
             }
         }
 

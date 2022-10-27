@@ -10,6 +10,8 @@ import java.io.OutputStream;
 
 import static com.example.anti_vampireboxapp.Constants.MESSAGE_READ;
 
+import com.example.anti_vampireboxapp.Constants;
+
 /**
  * This class handles the connection between the app and the Arduino once the connection has been
  * initialized. It also handles the messages send to the arduino and read from the Arduino on the
@@ -46,23 +48,25 @@ public class ConnectedThread extends Thread {
     public void run() {
         byte[] buffer = new byte[1024];  // buffer store for the stream
         int bytes = 0; // bytes returned from read()
+        this.write(Constants.REQUEST_POWER_LEVEL); //Starting message to start loop
+        this.write(Constants.TURN_CURRENT_VAMP_DEVICE_OFF);
         // Keep listening to the InputStream until an exception occurs
         while (true) {
             try {
                 /*
                 Read from the InputStream from Arduino until termination character is reached.
-                Then send the whole String message to GUI Handler.
+                Then send the whole String message to GUI Handler. ඞ
                 */
-                buffer[bytes] = (byte) mmInStream.read();
-                String readMessage;
-                if (buffer[bytes] == '\n'){
-                    readMessage = new String(buffer,0,bytes);
-                    Log.e("Arduino Message",readMessage);
+                byte charByte = (byte) mmInStream.read();
+                if(charByte == 35) { //Stopping char is an hashtag '#'
+                    String readMessage = new String(buffer,0,bytes);
                     handler.obtainMessage(MESSAGE_READ,readMessage).sendToTarget();
                     bytes = 0;
                 } else {
+                    buffer[bytes] = charByte;
                     bytes++;
                 }
+
             } catch (IOException e) {
                 e.printStackTrace();
                 break;

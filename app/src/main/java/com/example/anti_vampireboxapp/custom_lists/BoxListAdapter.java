@@ -14,9 +14,9 @@ import android.widget.Switch;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.SwitchCompat;
 
 import com.example.anti_vampireboxapp.R;
+import com.example.anti_vampireboxapp.activities.Activity;
 import com.example.anti_vampireboxapp.box.AntiVampBox;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -30,7 +30,7 @@ public class BoxListAdapter extends ArrayAdapter<AntiVampBox> {
     /**
      * The Activity (or Context) in which this boxListAdapter is created.
      */
-    private Context currContext;
+    private Activity currActivity;
 
     /**
      * Match constructor from super.
@@ -39,9 +39,9 @@ public class BoxListAdapter extends ArrayAdapter<AntiVampBox> {
      * @param boxes List of Anti-Vampire boxes.
      */
     public BoxListAdapter(@NonNull Context context, int resource, @NonNull List<AntiVampBox> boxes,
-                          Context currContext) {
+                          Activity currActivity) {
         super(context, resource, boxes);
-        this.currContext = currContext;
+        this.currActivity = currActivity;
     }
 
     /**
@@ -74,20 +74,7 @@ public class BoxListAdapter extends ArrayAdapter<AntiVampBox> {
         deviceAddressEditText.setText(selectedBox.getAddress());
         powerSwitch.setChecked(selectedBox.isCurrentEnabled());
 
-        switch(selectedBox.getConnectionState()) {
-            case NOT_CONNECTED:
-                wifiButton.setBackgroundTintList(ColorStateList.valueOf(Color.RED));
-                break;
-            case CONNECTING:
-                wifiButton.setBackgroundTintList(ColorStateList.valueOf(Color.YELLOW));
-                break;
-            case CONNECTED:
-                wifiButton.setBackgroundTintList(ColorStateList.valueOf(Color.GREEN));
-                break;
-            case CONNECTION_FAILED:
-                wifiButton.setBackgroundTintList(ColorStateList.valueOf(Color.DKGRAY));
-                break;
-        }
+        updateBluetoothStatus(selectedBox, wifiButton);
 
         //Add listener to update names of the box.
         boxNameEditText.addTextChangedListener(new TextWatcher() {
@@ -120,8 +107,8 @@ public class BoxListAdapter extends ArrayAdapter<AntiVampBox> {
             }
         });
         wifiButton.setOnClickListener(view -> {
-            selectedBox.connect(currContext);
-            //System.out.println(selectedBox.getName() + ", " + selectedBox.getAddress());
+            selectedBox.connect(currActivity);
+            updateBluetoothStatus(selectedBox, wifiButton); //TODO: MAKE THREAD THAT UPDATES THIS STUFF
         });
         /*Set the state of the powerSwitch to the corresponding state of the Anti-Vampire box
         that corresponds to this row. */
@@ -130,5 +117,22 @@ public class BoxListAdapter extends ArrayAdapter<AntiVampBox> {
         );
 
         return rowView;
+    }
+
+    private void updateBluetoothStatus(AntiVampBox selectedBox, FloatingActionButton wifiButton) {
+        switch(selectedBox.getConnectionState()) {
+            case NOT_CONNECTED:
+                wifiButton.setBackgroundTintList(ColorStateList.valueOf(Color.RED));
+                break;
+            case CONNECTING:
+                wifiButton.setBackgroundTintList(ColorStateList.valueOf(Color.YELLOW));
+                break;
+            case CONNECTED:
+                wifiButton.setBackgroundTintList(ColorStateList.valueOf(Color.GREEN));
+                break;
+            case CONNECTION_FAILED:
+                wifiButton.setBackgroundTintList(ColorStateList.valueOf(Color.DKGRAY));
+                break;
+        }
     }
 }

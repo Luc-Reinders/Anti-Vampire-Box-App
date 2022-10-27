@@ -20,6 +20,16 @@ public class VampDeviceUsageInfo {
     private double activeUsageAvg = 1;
 
     /**
+     * Amount of times a sleep point has been added.
+     */
+    int n = 0;
+
+    /**
+     * Amount of times an active point has been added.
+     */
+    int N = 0;
+
+    /**
      * Gets the usage in Watts at this moment in time.
      * @return A double in Watts
      */
@@ -47,12 +57,16 @@ public class VampDeviceUsageInfo {
      * powerUsage is closer to sleepUsageAvg or activeUsageAvg.
      * @param powerUsage a double greater than zero
      */
-    public void give(double powerUsage) {
+    public void add(double powerUsage) {
         usage = powerUsage;
         if(Math.abs(sleepUsageAvg - powerUsage) < Math.abs(activeUsageAvg - powerUsage)) {
-            sleepUsageAvg = (sleepUsageAvg + powerUsage)/2;
+            sleepUsageAvg = ((double)(n*sleepUsageAvg)/(double)(n + 1)) + (powerUsage/(double)(n + 1));
+            n++;
         } else {
-            activeUsageAvg = (activeUsageAvg + powerUsage)/2;
+            activeUsageAvg = ((double)(N*activeUsageAvg)/(double)(N + 1)) + (powerUsage/(double)(N + 1));
+            if(n > 0) {
+                N++;
+            }
         }
     }
 

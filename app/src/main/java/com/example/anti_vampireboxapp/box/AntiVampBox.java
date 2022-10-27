@@ -8,6 +8,8 @@ import android.content.Context;
 
 import androidx.annotation.NonNull;
 
+import com.example.anti_vampireboxapp.activities.Activity;
+
 /**
  * This class represents the Anti-Vampire box.
  */
@@ -28,10 +30,6 @@ public class AntiVampBox {
      * The MAC address of the Bluetooth device given by the user.
      */
     private String address = "";
-    /**
-     * Boolean to indicate if we are letting power through to the Vampire device or not.
-     */
-    private boolean currentEnabled = false;
 
 
     public String getName() {
@@ -46,16 +44,16 @@ public class AntiVampBox {
     public void setAddress(String address) {
         this.address = address;
     }
-    public boolean isCurrentEnabled() {
-        return currentEnabled;
-    }
-    public void setCurrentEnabled(boolean currentEnabled) {
-        this.currentEnabled = currentEnabled;
-    }
     public ConnectionState getConnectionState() {
         return connectionState;
     }
 
+    public boolean isCurrentEnabled() {
+        return arduinoConnection.isCurrentVampDeviceEnabled();
+    }
+    public void setCurrentEnabled(boolean currentEnabled) {
+        arduinoConnection.setCurrentVampDeviceEnabled(currentEnabled);
+    }
 
 
     /**
@@ -64,15 +62,17 @@ public class AntiVampBox {
      * @param currActivity The activity that is currently active when initializing this
      *                     Anti-Vampire box. This is needed because of permissions.
      */
-    public void connect(String deviceAddress, Context currActivity) {
-        connectionState = ConnectionState.CONNECTING;
-        if(arduinoConnection.connect(deviceAddress, currActivity)) {
-            connectionState = ConnectionState.CONNECTED;
-        } else {
-            connectionState = ConnectionState.CONNECTION_FAILED;
+    public void connect(String deviceAddress, Activity currActivity) {
+        if(connectionState == ConnectionState.NOT_CONNECTED || connectionState == ConnectionState.CONNECTION_FAILED) {
+            connectionState = ConnectionState.CONNECTING;
+            if(arduinoConnection.connect(deviceAddress, currActivity)) {
+                connectionState = ConnectionState.CONNECTED;
+            } else {
+                connectionState = ConnectionState.CONNECTION_FAILED;
+            }
         }
     }
-    public void connect(Context currActivity) {
+    public void connect(Activity currActivity) {
         connect(address, currActivity);
     }
 
@@ -97,7 +97,6 @@ public class AntiVampBox {
 
         return vampDeviceMoneySaved - arduinoCost;
     }
-
 
 
 

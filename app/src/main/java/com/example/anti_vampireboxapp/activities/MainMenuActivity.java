@@ -1,7 +1,11 @@
 package com.example.anti_vampireboxapp.activities;
 
+import android.Manifest;
 import android.view.View;
 import android.widget.ToggleButton;
+
+import androidx.core.app.ActivityCompat;
+
 import com.example.anti_vampireboxapp.BoxesManager;
 import com.example.anti_vampireboxapp.R;
 
@@ -44,6 +48,11 @@ public class MainMenuActivity extends Activity {
                 antiVampBoxesToggleButton.setText("Custom");
             }
         }
+
+        ActivityCompat.requestPermissions(this,
+                new String [] { Manifest.permission.BLUETOOTH_CONNECT , Manifest.permission.BLUETOOTH_SCAN},
+                3
+        );
     }
 
     /**
