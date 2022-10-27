@@ -64,7 +64,7 @@ public class VampDeviceUsageInfo {
             n++;
         } else {
             activeUsageAvg = ((double)(N*activeUsageAvg)/(double)(N + 1)) + (powerUsage/(double)(N + 1));
-            if(n > 0) {
+            if(n > 0) { //Prevents the activeUsageAvg to converge in on the actual sleeping avg
                 N++;
             }
         }
